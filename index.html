@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Tracker — Mockup</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --navy:#1a365d;
+  --navy-50:#eef3fa;
+  --ink:#111418;
+  --ink-2:#2a2f3a;
+  --mute:#6b7280;
+  --line:#e5e7eb;
+  --line-soft:#f1f3f6;
+  --bg:#ffffff;
+  --soft:#fafbfc;
+  --ok:#16794b;
+  --ok-bg:#ecfdf5;
+  --warn:#b45309;
+  --warn-bg:#fff7ed;
+  --danger:#b42318;
+  --danger-bg:#fef2f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Pretendard Variable',Pretendard,ui-sans-serif,system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;
+  color:var(--ink);background:var(--soft);
+  font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer}
+
+/* Layout */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:24px 20px;display:flex;flex-direction:column;gap:28px}
+.main{padding:32px 40px;overflow-x:auto}
+
+/* Brand */
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:28px;height:28px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+.brand h1{font-size:15px;font-weight:700;letter-spacing:-0.01em}
+.brand small{color:var(--mute);font-size:11px;display:block;margin-top:-2px}
+
+/* Nav */
+.nav-label{font-size:11px;font-weight:600;color:var(--mute);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;padding:0 8px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:8px;
+  color:var(--ink-2);font-size:13.5px;font-weight:500;
+  border:none;background:none;text-align:left;width:100%;
+  transition:background .12s;
+}
+.nav-item:hover{background:var(--navy-50)}
+.nav-item.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-item .count{margin-left:auto;font-size:11px;background:var(--line);color:var(--ink-2);padding:2px 7px;border-radius:10px;font-weight:600}
+.nav-item.active .count{background:rgba(255,255,255,0.22);color:#fff}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+
+/* Nested sub-item under 전체 프로젝트 */
+.nav-item.nav-sub{
+  padding-left:32px;font-size:12.5px;color:var(--mute);font-weight:500;
+}
+.nav-item.nav-sub .nav-bullet{
+  width:5px;height:5px;border-radius:50%;background:var(--line);flex-shrink:0;
+  transition:background .12s;
+}
+.nav-item.nav-sub:hover .nav-bullet{background:var(--navy)}
+.nav-item.nav-sub.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-item.nav-sub.active .nav-bullet{background:#fff}
+
+/* Sidebar footer */
+.sidebar-footer{margin-top:auto;font-size:11px;color:var(--mute);padding:12px 8px;border-top:1px solid var(--line-soft)}
+
+/* Calendar */
+.cal-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-title{font-size:17px;font-weight:700;letter-spacing:-0.01em;font-variant-numeric:tabular-nums}
+.cal-nav{display:flex;gap:6px;align-items:center}
+.cal-nav .btn{padding:6px 10px;font-size:12.5px}
+.cal-nav .btn svg{width:12px;height:12px}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:0;border-bottom:1px solid var(--line);margin-bottom:0}
+.cal-weekday{padding:8px 6px;font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:0.06em;text-align:center}
+.cal-weekday.sun{color:#dc2626}
+.cal-weekday.sat{color:#2563eb}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;border-left:1px solid var(--line-soft)}
+.cal-day{
+  min-height:88px;padding:6px 8px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+  display:flex;flex-direction:column;gap:4px;background:#fff;
+}
+.cal-day.other-month{background:var(--soft);color:var(--mute)}
+.cal-day.other-month .cal-daynum{color:#c7cbd3}
+.cal-daynum{font-size:12px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.cal-day.sun .cal-daynum{color:#dc2626}
+.cal-day.sat .cal-daynum{color:#2563eb}
+.cal-day.today{background:var(--navy-50)}
+.cal-day.today .cal-daynum{background:var(--navy);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px}
+.cal-events{display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.cal-event{
+  background:var(--navy);color:#fff;font-size:11px;font-weight:600;
+  padding:2px 6px;border-radius:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:default;
+}
+.cal-event.pending{background:var(--warn);color:#fff}
+.cal-event.done{background:var(--ok);color:#fff}
+.cal-empty{color:var(--mute);font-size:12px;padding:30px;text-align:center}
+
+/* Todo (weekly view) */
+.todo-wrap{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.todo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.todo-datepick{display:flex;align-items:center;gap:8px}
+.todo-datepick input[type=date]{
+  font-family:inherit;font-size:13px;padding:7px 10px;
+  border:1px solid var(--line);border-radius:7px;background:var(--soft);
+  font-variant-numeric:tabular-nums;
+}
+.todo-datepick input[type=date]:focus{outline:none;border-color:var(--navy);background:#fff}
+.todo-title{font-size:17px;font-weight:700;letter-spacing:-0.01em}
+.todo-title .range{color:var(--mute);font-size:13px;font-weight:500;margin-left:8px;font-variant-numeric:tabular-nums}
+.todo-quickbtns{display:flex;gap:4px}
+.todo-quickbtns .btn{padding:6px 10px;font-size:12.5px}
+.todo-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+@media (max-width:1200px){.todo-week-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}}
+.todo-day{
+  background:var(--soft);border:1px solid var(--line);border-radius:8px;
+  padding:10px 10px 12px;display:flex;flex-direction:column;min-height:220px;
+}
+.todo-day.is-today{background:#fff;border-color:var(--navy);box-shadow:0 0 0 1px var(--navy) inset}
+.todo-day.is-weekend .td-dow{color:#c53030}
+.todo-day.is-weekend.sat .td-dow{color:#2b6cb0}
+.td-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;gap:6px}
+.td-dow{font-size:12.5px;font-weight:700;letter-spacing:-0.01em}
+.td-date{font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
+.td-count{font-size:10.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.td-list{flex:1;display:flex;flex-direction:column;gap:4px;margin-bottom:8px;min-height:20px}
+.td-empty{color:var(--mute);font-size:11.5px;padding:4px 2px}
+.td-add{display:flex;gap:4px}
+.td-add input{
+  flex:1;min-width:0;font-family:inherit;font-size:12px;padding:6px 8px;
+  border:1px solid var(--line);border-radius:6px;background:#fff;
+}
+.td-add input:focus{outline:none;border-color:var(--navy)}
+.td-add button{
+  padding:6px 8px;font-size:11px;border:1px solid var(--navy);
+  background:var(--navy);color:#fff;border-radius:6px;cursor:pointer;
+}
+.todo-add input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-50)}
+.todo-list{display:flex;flex-direction:column;gap:2px}
+.todo-item{
+  display:flex;align-items:center;gap:10px;padding:10px 10px;
+  border-radius:7px;transition:background .12s;
+}
+.todo-item:hover{background:var(--soft)}
+.todo-item .checkbox{flex-shrink:0}
+.todo-item .text{flex:1;font-size:13.5px;color:var(--ink);cursor:pointer}
+.todo-item.done .text{color:var(--mute);text-decoration:line-through}
+.todo-item .del{
+  background:none;border:none;color:#c7cbd3;cursor:pointer;
+  width:24px;height:24px;border-radius:5px;display:inline-flex;
+  align-items:center;justify-content:center;transition:all .12s;
+}
+.todo-item .del:hover{color:var(--danger);background:var(--danger-bg)}
+.todo-empty{padding:40px 20px;text-align:center;color:var(--mute);font-size:13px}
+.todo-summary{font-size:12px;color:var(--mute);margin-top:10px;padding-top:10px;border-top:1px solid var(--line-soft)}
+/* Compact variant used inside weekly day cards */
+.todo-day .todo-item{padding:4px 6px;gap:6px}
+.todo-day .todo-item .text{font-size:12.5px;line-height:1.35}
+.todo-day .todo-item .del{width:18px;height:18px}
+.todo-day .todo-item .del svg{width:10px;height:10px}
+.todo-day .checkbox{width:14px;height:14px;border-radius:4px}
+.todo-day .checkbox.checked::after{font-size:10px}
+
+/* Main header */
+.main-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;gap:20px}
+.main-header h2{font-size:24px;font-weight:700;letter-spacing:-0.015em}
+.main-header .sub{color:var(--mute);font-size:13px;margin-top:2px}
+.actions{display:flex;gap:8px;align-items:center}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border:1px solid var(--line);background:#fff;
+  border-radius:7px;font-size:13px;font-weight:500;color:var(--ink-2);
+  transition:all .12s;
+}
+.btn:hover{border-color:var(--navy);color:var(--navy)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.primary:hover{background:#0f2442;border-color:#0f2442;color:#fff}
+.btn svg{width:13px;height:13px}
+
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+}
+.stat .label{font-size:11px;color:var(--mute);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.stat .value{font-size:22px;font-weight:700;margin-top:4px;letter-spacing:-0.01em}
+.stat .value.warn{color:var(--warn)}
+.stat .value.ok{color:var(--ok)}
+.stat .delta{font-size:11px;color:var(--mute);margin-top:2px}
+
+/* Filter bar */
+.filter-bar{
+  background:#fff;border:1px solid var(--line);border-radius:10px 10px 0 0;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:none;
+}
+.filter-bar input[type=text]{
+  flex:1;border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:13px;
+  font-family:inherit;background:var(--soft);
+}
+.filter-bar input[type=text]:focus{outline:none;border-color:var(--navy);background:#fff}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--navy-50);color:var(--navy);
+  padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;
+}
+
+/* Table */
+.table-wrap{background:#fff;border:1px solid var(--line);border-radius:0 0 10px 10px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{padding:12px 14px;text-align:left;font-size:13px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+th{
+  background:var(--soft);color:var(--mute);font-weight:600;font-size:11px;
+  letter-spacing:0.06em;text-transform:uppercase;position:sticky;top:0;
+  border-bottom:1.5px solid var(--line);
+}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--soft)}
+tbody tr:last-child td{border-bottom:none}
+td.num{font-variant-numeric:tabular-nums;font-weight:500}
+td.date{color:var(--mute);font-variant-numeric:tabular-nums}
+
+/* Checkbox cell */
+.checkbox{
+  width:18px;height:18px;border:1.5px solid var(--line);border-radius:4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;background:#fff;transition:all .12s;
+}
+.checkbox:hover{border-color:var(--navy)}
+.checkbox.checked{background:var(--ok);border-color:var(--ok)}
+.checkbox.checked::after{
+  content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;
+  transform:rotate(45deg) translate(-1px,-1px);
+}
+.cell-check{display:flex;align-items:center;gap:8px;font-weight:500}
+.cell-check .label{font-size:12px;color:var(--mute)}
+.cell-check.is-paid .label{color:var(--ok);font-weight:600}
+
+/* Project row expandable */
+.project-name{font-weight:600;color:var(--ink)}
+.project-sub{font-size:11.5px;color:var(--mute);margin-top:2px}
+.staff-list{display:flex;flex-direction:column;gap:3px;font-size:12.5px}
+.staff-row{display:flex;justify-content:space-between;padding:2px 0;color:var(--ink-2)}
+.staff-row .nm{color:var(--mute)}
+
+/* Status badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.02em;
+}
+.badge.pending{background:var(--warn-bg);color:var(--warn)}
+.badge.paid{background:var(--ok-bg);color:var(--ok)}
+.badge.mixed{background:#f5f3ff;color:#6d28d9}
+
+/* Row states */
+tr.row-done td:first-child{border-left:3px solid var(--ok);padding-left:11px}
+tr.row-pending td:first-child{border-left:3px solid var(--warn);padding-left:11px}
+
+/* Table footer totals */
+#tableFoot tr{background:var(--soft);border-top:2px solid var(--line)}
+#tableFoot td{padding:14px;font-weight:700;border-bottom:none}
+#tableFoot .total-label{color:var(--mute);font-size:11.5px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+#tableFoot .total-value{font-variant-numeric:tabular-nums;font-size:14.5px;color:var(--ink);display:block;margin-top:2px}
+#tableFoot .total-value.neg{color:var(--danger)}
+#tableFoot .total-value.ok{color:var(--ok)}
+#tableFoot .total-sub{font-size:10.5px;color:var(--mute);font-weight:500;margin-top:2px}
+
+/* Note text */
+.note-text{font-size:12px;color:var(--mute);font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-text.empty{color:#c7cbd3;font-style:normal}
+
+/* Inline edit inputs */
+.edit-input{
+  font-family:inherit;font-size:13px;color:var(--ink);
+  background:transparent;border:1px solid transparent;border-radius:5px;
+  padding:5px 7px;width:100%;
+  transition:all .12s;
+}
+.edit-input:hover{background:var(--soft);border-color:var(--line)}
+.edit-input:focus{outline:none;background:#fff;border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-50)}
+.name-input{font-weight:600;font-size:13.5px;color:var(--ink)}
+.date-input{font-variant-numeric:tabular-nums;color:var(--mute);min-width:130px}
+.date-range-wrap{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.date-range-wrap .date-input{min-width:130px;font-size:12.5px}
+.date-range-wrap .date-row{display:flex;align-items:center;gap:4px;width:100%}
+.date-range-wrap .end-row .date-sep{color:var(--mute);font-size:11px;padding:0 2px;flex-shrink:0}
+.date-range-wrap .range-add,
+.date-range-wrap .range-clear{
+  background:none;border:none;color:var(--mute);font-size:11px;
+  padding:2px 4px;cursor:pointer;border-radius:4px;
+  display:inline-flex;align-items:center;gap:2px;
+  transition:all .12s;font-family:inherit;
+}
+.date-range-wrap .range-add:hover{color:var(--navy);background:var(--navy-50)}
+.date-range-wrap .range-clear{color:#c7cbd3;font-size:13px;line-height:1;padding:2px 5px}
+.date-range-wrap .range-clear:hover{color:var(--danger);background:var(--danger-bg)}
+.amt-wrap{display:flex;align-items:center;gap:2px}
+.amt-wrap .won{color:var(--mute);font-size:13px;flex-shrink:0;padding-left:4px}
+.amt-input{font-variant-numeric:tabular-nums;text-align:right;font-weight:500;min-width:90px}
+.amt-input::-webkit-outer-spin-button,.amt-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.note-input{font-size:12.5px;font-style:italic;color:var(--ink-2)}
+.note-input::placeholder{color:#c7cbd3;font-style:normal}
+
+/* Payout trigger button (replaces simple checkbox) */
+.payout-trigger{
+  background:none;border:1px solid transparent;border-radius:6px;
+  padding:5px 9px;display:inline-flex;align-items:center;gap:8px;
+  font-family:inherit;font-size:13px;color:var(--ink-2);cursor:pointer;
+  transition:all .12s;font-weight:500;
+}
+.payout-trigger:hover{background:var(--soft);border-color:var(--line)}
+.payout-trigger.is-paid{color:var(--ok);font-weight:600}
+.payout-trigger.is-partial{color:var(--warn);font-weight:600}
+.checkbox.partial{
+  background:var(--warn);border-color:var(--warn);position:relative;
+}
+.checkbox.partial::after{
+  content:"";position:absolute;top:4px;left:3px;right:3px;height:2px;background:#fff;border-radius:1px;
+}
+
+/* Payout Popover */
+.payout-popover{
+  position:absolute;z-index:90;background:#fff;
+  border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 10px 40px rgba(17,20,24,0.15),0 2px 8px rgba(17,20,24,0.05);
+  padding:12px;min-width:280px;max-width:340px;
+}
+.pop-head{padding:4px 8px 10px;border-bottom:1px solid var(--line-soft)}
+.pop-title{font-weight:700;font-size:13.5px;color:var(--ink)}
+.pop-sub{font-size:11.5px;color:var(--mute);margin-top:2px}
+.pop-list{padding:6px 0;max-height:260px;overflow-y:auto}
+.pop-check-label{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:7px;cursor:pointer;
+  font-size:13px;transition:background .12s;
+}
+.pop-check-label:hover{background:var(--soft)}
+.pop-check-label.done .nm{text-decoration:line-through;color:var(--mute)}
+.pop-check-label input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--ok);cursor:pointer;flex-shrink:0;
+}
+.pop-check-label .nm{flex:1;color:var(--ink)}
+.pop-check-label .amt{font-variant-numeric:tabular-nums;color:var(--mute);font-size:12.5px}
+.pop-row{padding:10px 8px}
+.pop-foot{padding-top:10px;margin-top:6px;border-top:1px solid var(--line-soft);display:flex;justify-content:flex-end}
+.pop-foot .btn{font-size:12px;padding:6px 12px}
+
+/* Net revenue (auto-calc) */
+.net-revenue{
+  font-variant-numeric:tabular-nums;font-weight:600;
+  color:var(--ok);background:var(--ok-bg);
+  padding:6px 10px;border-radius:6px;display:inline-block;
+  font-size:13px;
+}
+.net-revenue.neg{color:var(--danger);background:var(--danger-bg)}
+.net-revenue.zero{color:var(--mute);background:var(--soft)}
+
+/* Row action buttons */
+.row-actions{text-align:center}
+.icon-btn{
+  background:none;border:1px solid transparent;border-radius:6px;
+  width:28px;height:28px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--mute);cursor:pointer;transition:all .12s;
+}
+.icon-btn:hover{background:var(--danger-bg);border-color:#fca5a5;color:var(--danger)}
+
+/* Staff detail editable */
+tr.staff-total-row{background:var(--soft);font-weight:700}
+tr.staff-total-row td{padding:12px 14px;border-bottom:none}
+.add-staff-inline{
+  background:none;border:1px dashed var(--line);color:var(--mute);
+  padding:8px 14px;width:100%;border-radius:7px;font-size:12.5px;
+  font-family:inherit;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .12s;
+}
+.add-staff-inline:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-50)}
+
+/* Modal */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(17,20,24,0.4);
+  display:none;align-items:center;justify-content:center;z-index:100;
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  background:#fff;border-radius:12px;width:min(520px,92vw);
+  box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  padding:24px 28px 20px;
+}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:14px}
+.modal .field{margin-bottom:14px}
+.modal label{display:block;font-size:11px;font-weight:600;color:var(--mute);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px}
+.modal input[type=text],.modal input[type=date],.modal input[type=number],.modal textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;
+  font-family:inherit;font-size:13.5px;background:var(--soft);
+}
+.modal input:focus,.modal textarea:focus{outline:none;border-color:var(--navy);background:#fff}
+.modal textarea{resize:vertical;min-height:60px}
+.modal .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.staff-editor{border:1px dashed var(--line);border-radius:8px;padding:10px}
+.staff-editor-row{display:grid;grid-template-columns:1fr 110px 140px 28px;gap:6px;margin-bottom:6px;align-items:center}
+.staff-editor-row input{padding:7px 9px;font-size:12.5px}
+.staff-editor-row .del{background:none;border:none;color:var(--mute);font-size:16px;cursor:pointer;line-height:1}
+.staff-editor-row .del:hover{color:var(--danger)}
+
+/* Tax type segmented control */
+.tax-seg{
+  display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  background:var(--soft);font-size:11px;font-weight:600;line-height:1;
+}
+.tax-seg button{
+  background:none;border:none;padding:5px 9px;color:var(--mute);cursor:pointer;
+  font-family:inherit;font-size:11px;font-weight:600;transition:all .12s;white-space:nowrap;
+}
+.tax-seg button:hover{color:var(--navy)}
+.tax-seg button.active{background:var(--navy);color:#fff}
+.tax-seg.freelance button.active{background:#6d28d9}
+.tax-seg.invoice button.active{background:#1a365d}
+.tax-hint{font-size:10.5px;color:var(--mute);margin-top:3px}
+.tax-hint.freelance{color:#6d28d9}
+.add-staff{background:none;border:1px dashed var(--line);color:var(--mute);padding:6px 10px;width:100%;border-radius:6px;font-size:12px;margin-top:4px}
+.add-staff:hover{border-color:var(--navy);color:var(--navy)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft)}
+
+/* Empty state */
+.empty{padding:60px 20px;text-align:center;color:var(--mute)}
+.empty h3{color:var(--ink-2);margin-bottom:6px;font-size:15px}
+
+/* Backup Reminder Banner */
+.backup-banner{
+  display:none;align-items:center;gap:14px;
+  padding:12px 16px;margin-bottom:16px;border-radius:10px;
+  border:1px solid transparent;font-size:13px;
+}
+.backup-banner.warn{
+  background:#fffbeb;border-color:#fde68a;color:#92400e;
+}
+.backup-banner.danger{
+  background:#fef2f2;border-color:#fca5a5;color:#991b1b;
+}
+.backup-banner.show{display:flex}
+.backup-banner .banner-icon{width:18px;height:18px;flex-shrink:0}
+.backup-banner .banner-text{flex:1;font-weight:500}
+.backup-banner .banner-text b{font-weight:700}
+.backup-banner .banner-actions{display:flex;gap:6px;flex-shrink:0}
+.backup-banner .banner-btn{
+  background:#fff;border:1px solid currentColor;color:inherit;
+  padding:5px 11px;border-radius:6px;font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;
+}
+.backup-banner .banner-btn.ghost{background:transparent;border-color:transparent;font-weight:500}
+.backup-banner .banner-btn:hover{opacity:0.85}
+
+/* Hidden file input for import */
+#importFileInput{display:none}
+
+/* Toast notification */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;
+  font-size:13px;font-weight:500;z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,0.18);
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.toast.ok{background:var(--ok)}
+.toast.err{background:var(--danger)}
+
+@media (max-width:880px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:20px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+/* Login overlay */
+.login-overlay{position:fixed;inset:0;background:#f6f7f9;display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.login-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:32px 28px;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(17,20,24,0.06)}
+.login-card h1{margin:0 0 6px;font-size:22px;color:var(--navy);font-weight:700}
+.login-card .sub{color:var(--mute);font-size:13px;margin-bottom:22px;line-height:1.5}
+.login-card input[type=email],.login-card input[type=password]{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box}
+.login-card input[type=email]:focus,.login-card input[type=password]:focus{border-color:var(--navy)}
+.login-card button{width:100%;margin-top:10px;padding:11px;background:var(--navy);color:#fff;border:0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.login-card button:hover{background:#12294a}
+.login-card button:disabled{background:#9aa3b2;cursor:not-allowed}
+.login-msg{margin-top:14px;font-size:13px;line-height:1.5;min-height:18px}
+.login-msg.ok{color:#15803d}
+.login-msg.err{color:#b91c1c}
+.login-foot{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);color:var(--mute);font-size:12px;line-height:1.5}
+.login-foot b{color:var(--ink)}
+.user-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--soft);border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--ink-2)}
+.user-chip button{background:none;border:0;color:var(--mute);cursor:pointer;font-size:12px;padding:0 0 0 4px}
+.user-chip button:hover{color:var(--danger)}
+</style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="loginOverlay" class="login-overlay" style="display:none">
+  <div class="login-card">
+    <h1>Studio Tracker</h1>
+    <div class="sub">이메일과 비밀번호로 로그인하세요.<br>처음이면 자동으로 계정이 생성됩니다.</div>
+    <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" inputmode="email">
+    <input type="password" id="loginPassword" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" style="margin-top:8px">
+    <button id="loginBtn">로그인 / 가입</button>
+    <div class="login-msg" id="loginMsg"></div>
+    <div class="login-foot">
+      <b>Tip:</b> 같은 이메일+비밀번호로 여러 기기에서 로그인하면 데이터가 실시간으로 공유됩니다.
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <h1>Studio Tracker</h1>
+        <small>v1.1 MVP</small>
+      </div>
+    </div>
+
+    <div>
+      <div class="nav-label">Views</div>
+      <div class="nav">
+        <button class="nav-item active" data-view="all">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          전체 프로젝트
+          <span class="count" id="countAll">5</span>
+        </button>
+        <button class="nav-item nav-sub" data-view="unsettled">
+          <span class="nav-bullet"></span>
+          미정산
+          <span class="count" id="countUnsettled">3</span>
+        </button>
+        <button class="nav-item nav-sub" data-view="settled">
+          <span class="nav-bullet"></span>
+          정산 완료
+          <span class="count" id="countSettled">2</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="nav-label">Pages</div>
+      <div class="nav">
+        <button class="nav-item" data-page="calendar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </button>
+        <button class="nav-item" data-page="todo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          할 일
+          <span class="count" id="countTodo">0</span>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="main-header">
+      <div>
+        <h2 id="viewTitle">전체 프로젝트</h2>
+        <div class="sub" id="viewSub">촬영일 오름차순</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnBackup" title="전체 데이터를 JSON 파일로 내려받아요">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          백업하기
+        </button>
+        <button class="btn" id="btnRestore" title="백업 JSON 파일에서 데이터 복원">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          복원하기
+        </button>
+        <input type="file" id="importFileInput" accept="application/json,.json" />
+        <button class="btn primary" id="btnNew">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          새 프로젝트
+        </button>
+      </div>
+    </header>
+
+    <div id="backupBanner" class="backup-banner">
+      <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <div class="banner-text" id="bannerText"></div>
+      <div class="banner-actions">
+        <button class="banner-btn" id="bannerBackupBtn">지금 백업하기</button>
+        <button class="banner-btn ghost" id="bannerDismissBtn">나중에</button>
+      </div>
+    </div>
+
+    <div id="pageDashboard">
+    <div class="stats">
+      <div class="stat">
+        <div class="label">미입금 건</div>
+        <div class="value warn" id="statUnpaid">2</div>
+        <div class="delta">총 ₩ <span id="statUnpaidAmt">4,500,000</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">미출금 건</div>
+        <div class="value warn" id="statUnpayout">2</div>
+        <div class="delta">총 ₩ <span id="statUnpayoutAmt">1,350,000</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">누적 순입금</div>
+        <div class="value ok">₩ <span id="statMonthIn">0</span></div>
+        <div class="delta"><span id="statMonthInCount">0</span>건 완료 · 순매출 기준</div>
+      </div>
+      <div class="stat">
+        <div class="label">누적 출금</div>
+        <div class="value ok">₩ <span id="statMonthOut">0</span></div>
+        <div class="delta"><span id="statMonthOutCount">0</span>건 완료</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="searchBox" placeholder="프로젝트명 / 스태프명 검색..." />
+      <span class="chip" id="activeChip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        미정산만
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th style="width:22%">프로젝트</th>
+            <th style="width:8%">촬영일</th>
+            <th style="width:8%">보정납품일</th>
+            <th style="width:12%" class="num">고객 수금액</th>
+            <th style="width:12%" class="num">순 매출</th>
+            <th style="width:11%">세금계산서</th>
+            <th style="width:12%">입금</th>
+            <th style="width:11%">출금</th>
+            <th style="width:4%"></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+
+    <div id="staffDetail" style="margin-top:24px;display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-size:15px;font-weight:700">선택된 프로젝트의 스태프 비용</h3>
+        <button class="btn" id="btnCloseStaff" title="닫기" style="padding:5px 10px;font-size:12px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          닫기
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>스태프 이름</th>
+              <th style="text-align:right">지급 예정액</th>
+              <th>세금 구분</th>
+              <th>지급 상태</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="staffBody"></tbody>
+        </table>
+      </div>
+    </div>
+    </div><!-- /#pageDashboard -->
+
+    <div id="pageCalendar" style="display:none">
+      <div class="cal-wrap">
+        <div class="cal-header">
+          <div class="cal-title" id="calTitle">2026년 4월</div>
+          <div class="cal-nav">
+            <button class="btn" id="calPrev" title="이전 달">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="btn" id="calToday">오늘</button>
+            <button class="btn" id="calNext" title="다음 달">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cal-weekdays">
+          <div class="cal-weekday sun">일</div>
+          <div class="cal-weekday">월</div>
+          <div class="cal-weekday">화</div>
+          <div class="cal-weekday">수</div>
+          <div class="cal-weekday">목</div>
+          <div class="cal-weekday">금</div>
+          <div class="cal-weekday sat">토</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <div id="pageTodo" style="display:none">
+      <div class="todo-wrap">
+        <div class="todo-header">
+          <div class="todo-datepick">
+            <input type="date" id="todoDate" title="날짜 선택 시 해당 주(월~일)로 이동">
+            <span class="todo-title">주간 할 일<span class="range" id="todoWeekRange"></span></span>
+          </div>
+          <div class="todo-quickbtns">
+            <button class="btn" id="todoPrev" title="이전 주">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="btn" id="todoToday">이번 주</button>
+            <button class="btn" id="todoNext" title="다음 주">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="todo-week-grid" id="todoWeekGrid"></div>
+        <div class="todo-summary" id="todoSummary"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Payout Popover -->
+<div id="payoutPopover" class="payout-popover" style="display:none"></div>
+
+<!-- New Project Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3>새 프로젝트</h3>
+    <div class="field">
+      <label>프로젝트명</label>
+      <input type="text" id="m_name" placeholder="예: 강남 브랜드 룩북">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>촬영 시작일</label>
+        <input type="date" id="m_date">
+      </div>
+      <div class="field">
+        <label>촬영 종료일 <span style="color:var(--mute);font-weight:400">(여러 날)</span></label>
+        <input type="date" id="m_endDate">
+      </div>
+    </div>
+    <div class="field">
+      <label>보정납품일</label>
+      <input type="date" id="m_delivery">
+    </div>
+    <div class="field">
+      <label>고객 수금액 (KRW)</label>
+      <input type="text" inputmode="numeric" id="m_amt" placeholder="3,000,000" oninput="liveFormatAmount(this)">
+    </div>
+    <div class="field">
+      <label>스태프 비용</label>
+      <div class="staff-editor" id="m_staff">
+        <div class="staff-editor-row">
+          <input type="text" placeholder="스태프 이름" class="s_name">
+          <input type="text" inputmode="numeric" placeholder="금액" class="s_amt" oninput="liveFormatAmount(this)">
+          <button class="del" onclick="this.parentNode.remove()">×</button>
+        </div>
+      </div>
+      <button class="add-staff" onclick="addStaffRow()">+ 스태프 추가</button>
+    </div>
+    <div class="field">
+      <label>메모 (선택)</label>
+      <textarea id="m_note" placeholder="특이사항 자유 기록"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">취소</button>
+      <button class="btn primary" onclick="saveProject()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ Data ============
+// ============ Supabase config ============
+const SUPABASE_URL = "https://yzcfntvhllprjpzpizah.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6Y2ZudHZobGxwcmpwenBpemFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4ODc0ODcsImV4cCI6MjA5MjQ2MzQ4N30.HG-gTBU4qVGp1HwguNIfbMmJjWmZMQ3TS0zmObaLsrs";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+let currentUser = null;
+let realtimeChannel = null;
+
+let projects = [];
+let currentView = "all";
+let searchQuery = "";
+const seedStaff = []; // kept name for compatibility with existing code
+let nextStaffId = 1;
+let todos = [];
+let nextTodoId = 1;
+
+// ============ Persistence (Supabase + localStorage cache) ============
+const STORAGE_KEY = "studio-data-v1";
+const BACKUP_META_KEY = "studio-backup-meta-v1";
+const BACKUP_WARN_DAYS = 30;
+const BACKUP_DANGER_DAYS = 60;
+const DATA_VERSION = 2;
+
+// Field mapping between app (camelCase + mixed) and DB (snake_case)
+function projectAppToDb(p){
+  return {
+    id: p.id,
+    name: p.name || "",
+    date: p.date || null,
+    end_date: p.endDate || null,
+    delivery_date: p.delivery_date || null,
+    client_payment: p.client_payment || 0,
+    paid: !!p.paid,
+    paid_at: p.paidAt || null,
+    invoice_issued: !!p.invoice_issued,
+    payout: !!p.payout,
+    note: p.note || ""
+  };
+}
+function projectDbToApp(r){
+  return {
+    id: r.id,
+    name: r.name || "",
+    date: r.date || "",
+    endDate: r.end_date || "",
+    delivery_date: r.delivery_date || "",
+    client_payment: r.client_payment || 0,
+    paid: !!r.paid,
+    paidAt: r.paid_at || null,
+    invoice_issued: !!r.invoice_issued,
+    payout: !!r.payout,
+    note: r.note || ""
+  };
+}
+function staffAppToDb(s){
+  return {
+    id: s.id,
+    pid: s.pid,
+    name: s.name || "",
+    amount: s.amount || 0,
+    paid: !!s.paid,
+    paid_at: s.paidAt || null,
+    tax_type: s.taxType || "freelance"
+  };
+}
+function staffDbToApp(r){
+  return {
+    id: r.id,
+    pid: r.pid,
+    name: r.name || "",
+    amount: r.amount || 0,
+    paid: !!r.paid,
+    paidAt: r.paid_at || null,
+    taxType: r.tax_type || "freelance"
+  };
+}
+function todoAppToDb(t){
+  return { id: t.id, date: t.date, text: t.text, done: !!t.done };
+}
+function todoDbToApp(r){
+  return { id: r.id, date: r.date, text: r.text, done: !!r.done };
+}
+
+// Write full state to localStorage cache (for offline viewing / fast startup)
+function cacheToLocal(){
+  try {
+    const payload = {
+      version: DATA_VERSION, savedAt: new Date().toISOString(),
+      projects, staff: seedStaff, nextStaffId, todos, nextTodoId
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch(_){}
+}
+
+// Debounced full sync of all arrays to Supabase.
+// Single-user scale: simple & reliable. Upserts + deletes orphans.
+let syncTimer = null;
+let syncPending = false;
+let lastSyncedSnapshot = null;
+function persist(){
+  cacheToLocal();
+  if(!currentUser) return; // offline / not-logged-in: local cache only
+  syncPending = true;
+  if(syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(runSyncToSupabase, 400);
+}
+async function runSyncToSupabase(){
+  if(!currentUser) return;
+  syncPending = false;
+  try {
+    const snap = JSON.stringify({ projects, staff: seedStaff, todos });
+    if(snap === lastSyncedSnapshot) return;
+    // Parallel upserts
+    const pRows = projects.map(projectAppToDb);
+    const sRows = seedStaff.map(staffAppToDb);
+    const tRows = todos.map(todoAppToDb);
+    const pIds = pRows.map(r => r.id);
+    const sIds = sRows.map(r => r.id);
+    const tIds = tRows.map(r => r.id);
+    const ops = [];
+    if(pRows.length) ops.push(sb.from("projects").upsert(pRows, { onConflict: "id" }));
+    if(sRows.length) ops.push(sb.from("staff").upsert(sRows, { onConflict: "id" }));
+    if(tRows.length) ops.push(sb.from("todos").upsert(tRows, { onConflict: "id" }));
+    // Delete orphans (rows in DB not in local state)
+    const delP = pIds.length
+      ? sb.from("projects").delete().not("id", "in", `(${pIds.join(",")})`)
+      : sb.from("projects").delete().neq("id", -1);
+    const delS = sIds.length
+      ? sb.from("staff").delete().not("id", "in", `(${sIds.join(",")})`)
+      : sb.from("staff").delete().neq("id", -1);
+    const delT = tIds.length
+      ? sb.from("todos").delete().not("id", "in", `(${tIds.join(",")})`)
+      : sb.from("todos").delete().neq("id", -1);
+    ops.push(delP, delS, delT);
+    const results = await Promise.all(ops);
+    const firstErr = results.find(r => r && r.error);
+    if(firstErr && firstErr.error){
+      console.error("Supabase sync error:", firstErr.error);
+      showToast("동기화 실패: " + firstErr.error.message, "err");
+      return;
+    }
+    lastSyncedSnapshot = snap;
+  } catch(err){
+    console.error("sync error:", err);
+    showToast("동기화 실패: " + (err && err.message || "네트워크"), "err");
+  }
+}
+
+async function loadFromSupabase(){
+  if(!currentUser) return false;
+  try {
+    const [pRes, sRes, tRes] = await Promise.all([
+      sb.from("projects").select("*").order("date", { ascending: false, nullsFirst: false }),
+      sb.from("staff").select("*").order("id", { ascending: true }),
+      sb.from("todos").select("*").order("date", { ascending: true })
+    ]);
+    if(pRes.error) throw pRes.error;
+    if(sRes.error) throw sRes.error;
+    if(tRes.error) throw tRes.error;
+    projects = (pRes.data || []).map(projectDbToApp);
+    seedStaff.length = 0;
+    (sRes.data || []).map(staffDbToApp).forEach(s => seedStaff.push(s));
+    todos = (tRes.data || []).map(todoDbToApp);
+    const maxSid = seedStaff.reduce((m,s)=>Math.max(m, s.id||0), 0);
+    const maxPid = projects.reduce((m,p)=>Math.max(m, p.id||0), 0);
+    const maxTid = todos.reduce((m,t)=>Math.max(m, t.id||0), 0);
+    nextStaffId = maxSid + 1;
+    nextTodoId = maxTid + 1;
+    // Seed next project ID hint as global counter for new projects (reuse nextStaffId pattern)
+    window._nextProjectId = maxPid + 1;
+    lastSyncedSnapshot = JSON.stringify({ projects, staff: seedStaff, todos });
+    cacheToLocal();
+    return true;
+  } catch(err){
+    console.error("Supabase load error:", err);
+    showToast("불러오기 실패: " + (err && err.message || "네트워크"), "err");
+    return false;
+  }
+}
+
+// Apply a loaded/imported data blob into app state.
+// - Refills seedStaff in place (array reassignment would break existing closures).
+// - Guards nextStaffId so it is always strictly greater than any staff id, even for
+//   hand-edited backups where the stored value is missing or stale.
+function applyLoadedData(data){
+  projects = data.projects;
+  seedStaff.length = 0;
+  data.staff.forEach(s => seedStaff.push(s));
+  const maxId = seedStaff.reduce((m,s) => Math.max(m, s.id||0), 0);
+  const stored = typeof data.nextStaffId === "number" ? data.nextStaffId : 0;
+  nextStaffId = Math.max(stored, maxId + 1);
+  // Todos (backward-compatible: older backups lack these fields)
+  todos = Array.isArray(data.todos) ? data.todos.slice() : [];
+  const maxTid = todos.reduce((m,t) => Math.max(m, t.id||0), 0);
+  const storedTid = typeof data.nextTodoId === "number" ? data.nextTodoId : 0;
+  nextTodoId = Math.max(storedTid, maxTid + 1, 1);
+}
+
+function loadFromStorage(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(!data || !Array.isArray(data.projects) || !Array.isArray(data.staff)) return false;
+    applyLoadedData(data);
+    return true;
+  } catch(err){
+    console.error("localStorage 복원 실패:", err);
+    return false;
+  }
+}
+
+function getBackupMeta(){
+  try {
+    const raw = localStorage.getItem(BACKUP_META_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function setBackupMeta(meta){
+  try { localStorage.setItem(BACKUP_META_KEY, JSON.stringify(meta)); } catch(e){}
+}
+
+function daysSince(iso){
+  if(!iso) return Infinity;
+  const t = new Date(iso).getTime();
+  if(isNaN(t)) return Infinity;
+  return (Date.now() - t) / 86400000;
+}
+
+// ============ Render ============
+function formatKRW(n){ return n.toLocaleString("ko-KR"); }
+// Strip non-digit chars and parse. Returns 0 for empty/invalid input.
+function parseAmount(str){ const d = String(str||"").replace(/[^0-9]/g, ""); return d ? parseInt(d, 10) : 0; }
+// Reformat a text input's value to comma-grouped digits while preserving caret position (best-effort).
+function liveFormatAmount(el){
+  const before = el.value;
+  const caret = el.selectionStart;
+  const digitsBeforeCaret = (before.slice(0, caret).match(/[0-9]/g) || []).length;
+  const n = parseAmount(before);
+  const formatted = n ? formatKRW(n) : "";
+  if(formatted === before) return;
+  el.value = formatted;
+  // Place caret after the Nth digit we counted
+  let pos = 0, seen = 0;
+  while(pos < formatted.length && seen < digitsBeforeCaret){
+    if(/[0-9]/.test(formatted[pos])) seen++;
+    pos++;
+  }
+  try { el.setSelectionRange(pos, pos); } catch(_){}
+}
+
+function staffOf(pid){ return seedStaff.filter(s => s.pid === pid); }
+function sumStaff(pid){ return staffOf(pid).reduce((a,s)=>a+s.amount,0); }
+function paidStaffCount(pid){ return staffOf(pid).filter(s => s.paid).length; }
+function isPayoutComplete(p){
+  const staffs = staffOf(p.id);
+  if(staffs.length === 0) return p.payout; // fallback to project-level when no staff
+  return staffs.every(s => s.paid);
+}
+
+function filteredProjects(){
+  let list = [...projects];
+  if(currentView === "unsettled"){
+    list = list.filter(p => !p.paid || !isPayoutComplete(p));
+  } else if(currentView === "settled"){
+    list = list.filter(p => p.paid && isPayoutComplete(p));
+  }
+  if(searchQuery.trim()){
+    const q = searchQuery.toLowerCase();
+    list = list.filter(p => {
+      if(p.name.toLowerCase().includes(q)) return true;
+      if(staffOf(p.id).some(s => s.name.toLowerCase().includes(q))) return true;
+      return false;
+    });
+  }
+  // 촬영일 오름차순 (오래된 것부터)
+  list.sort((a,b) => a.date.localeCompare(b.date));
+  return list;
+}
+
+const VIEW_META = {
+  all:       { title: "전체 프로젝트",      sub: "촬영일 오름차순" },
+  unsettled: { title: "미정산 프로젝트",    sub: "고객 입금 또는 스태프 출금이 완료되지 않은 프로젝트" },
+  settled:   { title: "정산 완료 프로젝트", sub: "입금·출금 모두 완료된 프로젝트" }
+};
+
+function renderTable(){
+  const tbody = document.getElementById("tableBody");
+  const tfoot = document.getElementById("tableFoot");
+  const list = filteredProjects();
+  if(list.length === 0){
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><h3>해당 조건에 맞는 프로젝트 없음</h3><small>필터를 풀거나 새 프로젝트를 추가하세요.</small></div></td></tr>`;
+    if(tfoot) tfoot.innerHTML = "";
+    return;
+  }
+  tbody.innerHTML = list.map(p => {
+    const totalStaff = sumStaff(p.id);
+    const staffCount = staffOf(p.id).length;
+    const paidCount = paidStaffCount(p.id);
+    const payoutDone = isPayoutComplete(p);
+    const rowClass = (p.paid && payoutDone) ? "row-done" : "row-pending";
+    return `
+      <tr class="${rowClass}" data-id="${p.id}">
+        <td>
+          <input class="edit-input name-input" type="text" value="${escapeHtml(p.name)}" onchange="updateField(${p.id},'name',this.value)" onclick="event.stopPropagation()" />
+          <div class="project-sub">스태프 ${staffOf(p.id).length}명</div>
+        </td>
+        <td>
+          <div class="date-range-wrap">
+            <div class="date-row">
+              <input class="edit-input date-input" type="date" value="${p.date}" onchange="updateField(${p.id},'date',this.value)" onclick="event.stopPropagation()" title="촬영 시작일" />
+            </div>
+            ${p.endDate ? `
+              <div class="date-row end-row">
+                <span class="date-sep">~</span>
+                <input class="edit-input date-input" type="date" value="${p.endDate}" min="${p.date}" onchange="updateField(${p.id},'endDate',this.value)" onclick="event.stopPropagation()" title="촬영 종료일" />
+                <button class="range-clear" onclick="event.stopPropagation();updateField(${p.id},'endDate','')" title="종료일 제거">×</button>
+              </div>
+            ` : `
+              <button class="range-add" onclick="event.stopPropagation();addEndDate(${p.id})" title="여러 날 촬영이면 종료일 추가">+ 종료일</button>
+            `}
+          </div>
+        </td>
+        <td>
+          <input class="edit-input date-input" type="date" value="${p.delivery_date || ''}" onchange="updateField(${p.id},'delivery_date',this.value)" onclick="event.stopPropagation()" />
+        </td>
+        <td>
+          <div class="amt-wrap">
+            <span class="won">₩</span>
+            <input class="edit-input amt-input" type="text" inputmode="numeric" value="${formatKRW(p.client_payment)}" onchange="updateField(${p.id},'client_payment',parseAmount(this.value))" oninput="liveFormatAmount(this)" onclick="event.stopPropagation()" />
+          </div>
+        </td>
+        <td>
+          <div class="net-revenue ${(p.client_payment - totalStaff) < 0 ? 'neg' : ((p.client_payment - totalStaff) === 0 ? 'zero' : '')}" title="고객 수금액 − 스태프 비용 합계">
+            ₩${formatKRW(p.client_payment - totalStaff)}
+          </div>
+        </td>
+        <td>
+          <div class="cell-check ${p.invoice_issued?'is-paid':''}" onclick="toggleInvoice(${p.id},event)">
+            <span class="checkbox ${p.invoice_issued?'checked':''}"></span>
+            <span class="label">${p.invoice_issued?'발행 완료':'미발행'}</span>
+          </div>
+        </td>
+        <td>
+          <div class="cell-check ${p.paid?'is-paid':''}" onclick="togglePaid(${p.id},event)">
+            <span class="checkbox ${p.paid?'checked':''}"></span>
+            <span class="label">${p.paid?'입금 완료':'미입금'}</span>
+          </div>
+        </td>
+        <td class="payout-cell">
+          <button class="payout-trigger ${payoutDone?'is-paid':(paidCount>0?'is-partial':'')}" onclick="togglePayoutPopover(${p.id},event)">
+            <span class="checkbox ${payoutDone?'checked':(paidCount>0?'partial':'')}"></span>
+            <span class="label">${
+              staffCount === 0 ? (p.payout?'지급 완료':'미지급')
+              : payoutDone ? `${paidCount}/${staffCount} 완료`
+              : paidCount > 0 ? `${paidCount}/${staffCount} 지급`
+              : `0/${staffCount} 미지급`
+            }</span>
+          </button>
+        </td>
+        <td class="row-actions">
+          <button class="icon-btn" title="삭제" onclick="deleteProject(${p.id},event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  // Bind row click for staff detail (toggle: 같은 행 다시 클릭 시 닫힘)
+  tbody.querySelectorAll("tr[data-id]").forEach(tr => {
+    tr.addEventListener("click", () => {
+      const pid = parseInt(tr.dataset.id);
+      const box = document.getElementById("staffDetail");
+      if(activeProjectId === pid && box.style.display === "block"){
+        hideStaff();
+      } else {
+        showStaff(pid);
+      }
+    });
+  });
+
+  // Totals row (reflects currently filtered list)
+  const totalRevenue = list.reduce((a,p) => a + (p.client_payment||0), 0);
+  const totalStaffCost = list.reduce((a,p) => a + sumStaff(p.id), 0);
+  const totalNet = totalRevenue - totalStaffCost;
+  const viewLabel = VIEW_META[currentView] ? VIEW_META[currentView].title : "전체";
+  const netCls = totalNet < 0 ? "neg" : (totalNet > 0 ? "ok" : "");
+  tfoot.innerHTML = `
+    <tr>
+      <td colspan="3">
+        <div class="total-label">누적 합계</div>
+        <div class="total-sub">${viewLabel} · ${list.length}건 기준</div>
+      </td>
+      <td class="num">
+        <div class="total-label">총 매출</div>
+        <div class="total-value">₩${formatKRW(totalRevenue)}</div>
+      </td>
+      <td class="num">
+        <div class="total-label">순매출 총액</div>
+        <div class="total-value ${netCls}">₩${formatKRW(totalNet)}</div>
+        <div class="total-sub">스태프 비용 ₩${formatKRW(totalStaffCost)} 차감</div>
+      </td>
+      <td colspan="4"></td>
+    </tr>
+  `;
+}
+
+let activeProjectId = null;
+
+function hideStaff(){
+  activeProjectId = null;
+  const box = document.getElementById("staffDetail");
+  if(box) box.style.display = "none";
+}
+
+function showStaff(pid){
+  const p = projects.find(x => x.id === pid);
+  if(!p) return;
+  activeProjectId = pid;
+  const staffs = staffOf(pid);
+  const box = document.getElementById("staffDetail");
+  const body = document.getElementById("staffBody");
+  document.querySelector("#staffDetail h3").textContent = `"${p.name}" 스태프 비용`;
+  body.innerHTML = staffs.map(s => {
+    const tax = s.taxType || "freelance";
+    const isFree = tax === "freelance";
+    const net = isFree ? Math.round(s.amount * 0.967) : s.amount; // 3.3% 원천징수 후 실지급
+    return `
+    <tr>
+      <td>
+        <input class="edit-input" type="text" value="${escapeHtml(s.name)}" placeholder="스태프 이름" onchange="updateStaff(${s.id},'name',this.value)" />
+      </td>
+      <td style="width:180px">
+        <div class="amt-wrap">
+          <span class="won">₩</span>
+          <input class="edit-input amt-input" type="text" inputmode="numeric" value="${formatKRW(s.amount)}" onchange="updateStaff(${s.id},'amount',parseAmount(this.value))" oninput="liveFormatAmount(this)" />
+        </div>
+        ${isFree ? `<div class="tax-hint freelance">실지급 ₩${formatKRW(net)} (3.3% 공제)</div>` : `<div class="tax-hint">세금계산서 기준</div>`}
+      </td>
+      <td style="width:170px">
+        <div class="tax-seg ${tax}">
+          <button class="${isFree?'active':''}" onclick="updateStaff(${s.id},'taxType','freelance')" title="사업소득 원천징수 3.3%">프리랜서 3.3%</button>
+          <button class="${!isFree?'active':''}" onclick="updateStaff(${s.id},'taxType','invoice')" title="세금계산서 수취">세금계산서</button>
+        </div>
+      </td>
+      <td style="width:120px">
+        <div class="cell-check ${s.paid?'is-paid':''}" onclick="toggleStaffPaidRow(${s.id})">
+          <span class="checkbox ${s.paid?'checked':''}"></span>
+          <span class="label">${s.paid?'지급됨':'미지급'}</span>
+        </div>
+      </td>
+      <td class="row-actions" style="width:48px">
+        <button class="icon-btn" title="삭제" onclick="deleteStaff(${s.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join("") + `
+    <tr class="staff-total"><td colspan="5">
+      <button class="add-staff-inline" onclick="addStaff(${pid})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        스태프 추가
+      </button>
+    </td></tr>
+    <tr class="staff-total-row">
+      <td><b>합계</b></td>
+      <td class="num" style="text-align:right"><b>₩${formatKRW(sumStaff(pid))}</b></td>
+      <td colspan="3"><small>${paidStaffCount(pid)}/${staffs.length} 지급 완료</small></td>
+    </tr>
+  `;
+  box.style.display = "block";
+}
+
+function toggleStaffPaidRow(sid){
+  const s = seedStaff.find(x => x.id === sid);
+  if(!s) return;
+  s.paid = !s.paid;
+  s.paidAt = s.paid ? new Date().toISOString() : null;
+  if(activeProjectId) showStaff(activeProjectId);
+  renderAll();
+}
+
+function updateStaff(sid, field, value){
+  const s = seedStaff.find(x => x.id === sid);
+  if(!s) return;
+  if(field === "name") s.name = value;
+  else if(field === "amount") s.amount = value;
+  else if(field === "taxType") s.taxType = value;
+  if(activeProjectId) showStaff(activeProjectId);
+  persist();
+  renderTable();
+  renderStats();
+}
+
+function addStaff(pid){
+  seedStaff.push({id:nextStaffId++, pid, name:"", amount:0, paid:false, taxType:"freelance"});
+  showStaff(pid);
+  persist();
+  renderTable();
+  renderStats();
+}
+
+function deleteStaff(sid){
+  const idx = seedStaff.findIndex(x => x.id === sid);
+  if(idx === -1) return;
+  seedStaff.splice(idx, 1);
+  if(activeProjectId) showStaff(activeProjectId);
+  persist();
+  renderTable();
+  renderStats();
+}
+
+function deleteProject(pid, e){
+  if(e) e.stopPropagation();
+  const p = projects.find(x => x.id === pid);
+  if(!p) return;
+  if(!confirm(`"${p.name}" 프로젝트를 삭제하시겠어요?\n연결된 스태프 비용 ${staffOf(pid).length}건도 함께 삭제됩니다.`)) return;
+  // Remove project and related staff
+  const pi = projects.findIndex(x => x.id === pid);
+  if(pi !== -1) projects.splice(pi, 1);
+  for(let i = seedStaff.length - 1; i >= 0; i--){
+    if(seedStaff[i].pid === pid) seedStaff.splice(i, 1);
+  }
+  if(activeProjectId === pid){
+    activeProjectId = null;
+    document.getElementById("staffDetail").style.display = "none";
+  }
+  renderAll();
+}
+
+function updateField(id, field, value){
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  if(field === "name") p.name = value;
+  else if(field === "date"){
+    p.date = value;
+    // 시작일이 종료일 이후로 바뀌면 종료일 무효화
+    if(p.endDate && p.endDate <= p.date) p.endDate = "";
+  }
+  else if(field === "endDate"){
+    // 시작일 이전/같으면 단일일로 정규화
+    p.endDate = (value && value > p.date) ? value : "";
+  }
+  else if(field === "delivery_date") p.delivery_date = value;
+  else if(field === "client_payment") p.client_payment = value;
+  else if(field === "note") p.note = value;
+  persist();
+  renderStats();
+  // Re-render net revenue cell only (avoid full rerender to keep focus)
+  if(field === "client_payment"){
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    if(row){
+      const netCell = row.querySelector(".net-revenue");
+      if(netCell){
+        const net = p.client_payment - sumStaff(id);
+        netCell.textContent = `₩${formatKRW(net)}`;
+        netCell.classList.toggle("neg", net < 0);
+        netCell.classList.toggle("zero", net === 0);
+      }
+    }
+  }
+  if(document.getElementById("staffDetail").style.display === "block"){
+    const active = document.querySelector("#staffDetail h3");
+    if(active) active.textContent = `"${p.name}" 스태프 비용`;
+  }
+  // 날짜 변경 시 정렬/캘린더 갱신
+  if(field === "date" || field === "endDate"){
+    renderTable();
+    if(document.getElementById("pageCalendar").style.display !== "none") renderCalendar();
+  }
+}
+
+function addEndDate(id){
+  const p = projects.find(x => x.id === id);
+  if(!p || !p.date) return;
+  // 시작일 + 1일로 기본값 설정
+  const d = new Date(p.date);
+  d.setDate(d.getDate() + 1);
+  const pad = n => String(n).padStart(2,"0");
+  p.endDate = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  persist();
+  renderTable();
+  if(document.getElementById("pageCalendar").style.display !== "none") renderCalendar();
+}
+
+function togglePaid(id, e){
+  e.stopPropagation();
+  const p = projects.find(x => x.id === id);
+  p.paid = !p.paid;
+  p.paidAt = p.paid ? new Date().toISOString() : null;
+  renderAll();
+}
+
+function toggleInvoice(id, e){
+  e.stopPropagation();
+  const p = projects.find(x => x.id === id);
+  p.invoice_issued = !p.invoice_issued;
+  renderAll();
+}
+
+function togglePayout(id, e){
+  e.stopPropagation();
+  const p = projects.find(x => x.id === id);
+  p.payout = !p.payout;
+  renderAll();
+}
+
+function togglePayoutPopover(pid, e){
+  e.stopPropagation();
+  const pop = document.getElementById("payoutPopover");
+  if(pop.dataset.pid === String(pid) && pop.style.display === "block"){
+    pop.style.display = "none"; pop.dataset.pid = "";
+    return;
+  }
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  renderPayoutPopover(pid);
+  pop.style.display = "block";
+  pop.dataset.pid = String(pid);
+  // Position below the button
+  const popRect = pop.getBoundingClientRect();
+  let left = rect.left + window.scrollX;
+  if(left + popRect.width > window.innerWidth - 16) left = window.innerWidth - popRect.width - 16;
+  pop.style.top = (rect.bottom + window.scrollY + 6) + "px";
+  pop.style.left = left + "px";
+}
+
+function renderPayoutPopover(pid){
+  const p = projects.find(x => x.id === pid);
+  const staffs = staffOf(pid);
+  const pop = document.getElementById("payoutPopover");
+  if(staffs.length === 0){
+    pop.innerHTML = `
+      <div class="pop-head">
+        <div class="pop-title">${escapeHtml(p.name)}</div>
+        <div class="pop-sub">스태프 없음 — 프로젝트 단위 체크</div>
+      </div>
+      <div class="pop-row">
+        <label class="pop-check-label">
+          <input type="checkbox" ${p.payout?'checked':''} onchange="toggleProjectPayoutFromPopover(${pid},this.checked)">
+          <span>지급 완료</span>
+        </label>
+      </div>
+    `;
+    return;
+  }
+  const paidCount = paidStaffCount(pid);
+  const allPaid = staffs.every(s => s.paid);
+  pop.innerHTML = `
+    <div class="pop-head">
+      <div class="pop-title">${escapeHtml(p.name)}</div>
+      <div class="pop-sub">${paidCount}/${staffs.length} 지급 완료 · 총 ₩${formatKRW(sumStaff(pid))}</div>
+    </div>
+    <div class="pop-list">
+      ${staffs.map(s => `
+        <label class="pop-check-label ${s.paid?'done':''}">
+          <input type="checkbox" ${s.paid?'checked':''} onchange="toggleStaffPaid(${s.id},this.checked)">
+          <span class="nm">${escapeHtml(s.name || '(이름 없음)')}</span>
+          <span class="amt">₩${formatKRW(s.amount)}</span>
+        </label>
+      `).join("")}
+    </div>
+    <div class="pop-foot">
+      <button class="btn" onclick="togglePayoutAll(${pid}, ${!allPaid})">
+        ${allPaid ? '전체 해제' : '전체 지급 완료'}
+      </button>
+    </div>
+  `;
+}
+
+function toggleStaffPaid(sid, checked){
+  const s = seedStaff.find(x => x.id === sid);
+  if(!s) return;
+  s.paid = checked;
+  s.paidAt = checked ? new Date().toISOString() : null;
+  renderAll();
+  // keep popover open and sync
+  const pid = s.pid;
+  renderPayoutPopover(pid);
+}
+
+function togglePayoutAll(pid, toPaid){
+  const nowIso = new Date().toISOString();
+  staffOf(pid).forEach(s => { s.paid = toPaid; s.paidAt = toPaid ? nowIso : null; });
+  renderAll();
+  renderPayoutPopover(pid);
+}
+
+function toggleProjectPayoutFromPopover(pid, checked){
+  const p = projects.find(x => x.id === pid);
+  if(!p) return;
+  p.payout = checked;
+  renderAll();
+  renderPayoutPopover(pid);
+}
+
+// Close popover on outside click
+document.addEventListener("click", (e) => {
+  const pop = document.getElementById("payoutPopover");
+  if(!pop || pop.style.display !== "block") return;
+  if(pop.contains(e.target)) return;
+  if(e.target.closest(".payout-trigger")) return;
+  pop.style.display = "none"; pop.dataset.pid = "";
+});
+
+function renderStats(){
+  const list = filteredProjects();
+  const unpaid = projects.filter(p => !p.paid);
+  const unpayoutProjects = projects.filter(p => !isPayoutComplete(p));
+  const unpayoutAmt = seedStaff.filter(s => !s.paid).reduce((a,s)=>a+s.amount,0);
+  document.getElementById("statUnpaid").textContent = unpaid.length;
+  document.getElementById("statUnpaidAmt").textContent = formatKRW(unpaid.reduce((a,p)=>a+p.client_payment,0));
+  document.getElementById("statUnpayout").textContent = unpayoutProjects.length;
+  document.getElementById("statUnpayoutAmt").textContent = formatKRW(unpayoutAmt);
+  const unsettledCount = projects.filter(p=>!p.paid||!isPayoutComplete(p)).length;
+  document.getElementById("countUnsettled").textContent = unsettledCount;
+  document.getElementById("countSettled").textContent = projects.length - unsettledCount;
+  document.getElementById("countAll").textContent = projects.length;
+  // 누적 순입금: 입금 완료된 프로젝트의 순매출(고객수금액 − 스태프비용 합계) 합계.
+  // 누적 출금: 출금 완료된 스태프 금액 합계.
+  const paidAll = projects.filter(p => p.paid);
+  const totalIn = paidAll.reduce((a,p)=>a+(p.client_payment - sumStaff(p.id)),0);
+  const paidStaffAll = seedStaff.filter(s => s.paid);
+  const totalOut = paidStaffAll.reduce((a,s)=>a+s.amount,0);
+  document.getElementById("statMonthIn").textContent = formatKRW(totalIn);
+  document.getElementById("statMonthInCount").textContent = paidAll.length;
+  document.getElementById("statMonthOut").textContent = formatKRW(totalOut);
+  document.getElementById("statMonthOutCount").textContent = paidStaffAll.length;
+}
+
+function renderAll(){
+  persist();
+  renderTable();
+  renderStats();
+  if(document.getElementById("pageCalendar").style.display !== "none") renderCalendar();
+}
+
+// ============ Calendar ============
+let calCursor = new Date(); calCursor.setDate(1);
+function renderCalendar(){
+  const grid = document.getElementById("calGrid");
+  const title = document.getElementById("calTitle");
+  const year = calCursor.getFullYear();
+  const month = calCursor.getMonth(); // 0-11
+  title.textContent = `${year}년 ${month+1}월`;
+
+  const first = new Date(year, month, 1);
+  const startDow = first.getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+
+  // Group projects by YYYY-MM-DD (expand multi-day ranges)
+  const byDate = {};
+  projects.forEach(p => {
+    if(!p.date) return;
+    const start = new Date(p.date);
+    const end = p.endDate ? new Date(p.endDate) : start;
+    if(isNaN(start) || isNaN(end) || end < start){
+      (byDate[p.date] = byDate[p.date] || []).push(p);
+      return;
+    }
+    const cur = new Date(start);
+    while(cur <= end){
+      const k = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,"0")}-${String(cur.getDate()).padStart(2,"0")}`;
+      (byDate[k] = byDate[k] || []).push(p);
+      cur.setDate(cur.getDate()+1);
+    }
+  });
+
+  const today = new Date();
+  const todayYmd = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+
+  let html = "";
+  const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
+  for(let i = 0; i < totalCells; i++){
+    let cellDate, dayNum, cls = "";
+    if(i < startDow){
+      dayNum = daysInPrev - startDow + 1 + i;
+      cellDate = new Date(year, month-1, dayNum);
+      cls = "other-month";
+    } else if(i < startDow + daysInMonth){
+      dayNum = i - startDow + 1;
+      cellDate = new Date(year, month, dayNum);
+    } else {
+      dayNum = i - startDow - daysInMonth + 1;
+      cellDate = new Date(year, month+1, dayNum);
+      cls = "other-month";
+    }
+    const dow = cellDate.getDay();
+    if(dow === 0) cls += " sun";
+    if(dow === 6) cls += " sat";
+    const ymd = `${cellDate.getFullYear()}-${String(cellDate.getMonth()+1).padStart(2,"0")}-${String(cellDate.getDate()).padStart(2,"0")}`;
+    if(ymd === todayYmd) cls += " today";
+    const list = byDate[ymd] || [];
+    const events = list.map(p => {
+      const complete = p.paid && isPayoutComplete(p);
+      const anyDone = p.paid || (staffOf(p.id).some(s => s.paid));
+      const evCls = complete ? "done" : (anyDone ? "pending" : "");
+      return `<div class="cal-event ${evCls}" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>`;
+    }).join("");
+    html += `<div class="cal-day ${cls}"><div class="cal-daynum">${dayNum}</div><div class="cal-events">${events}</div></div>`;
+  }
+  grid.innerHTML = html;
+}
+
+document.getElementById("calPrev").addEventListener("click", () => {
+  calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1);
+  renderCalendar();
+});
+document.getElementById("calNext").addEventListener("click", () => {
+  calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1);
+  renderCalendar();
+});
+document.getElementById("calToday").addEventListener("click", () => {
+  calCursor = new Date(); calCursor.setDate(1);
+  renderCalendar();
+});
+
+// ============ Todo (weekly view) ============
+const DOW_KR = ["일","월","화","수","목","금","토"];
+const DOW_WEEK = ["월","화","수","목","금","토","일"]; // Mon-first order
+function shiftYmd(ymd, deltaDays){
+  const d = new Date(ymd); d.setDate(d.getDate() + deltaDays);
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function mondayOf(ymd){
+  // Returns the Monday (YYYY-MM-DD) of the week containing ymd. Sunday belongs to the week it closes.
+  const d = new Date(ymd);
+  const dow = d.getDay(); // 0=Sun, 1=Mon, ...
+  const delta = dow === 0 ? -6 : 1 - dow;
+  return shiftYmd(ymd, delta);
+}
+function mmddLabel(ymd){
+  const d = new Date(ymd);
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+let todoCursor = mondayOf(todayStamp()); // always stores the Monday of the viewed week
+
+function renderTodo(){
+  const dateInput = document.getElementById("todoDate");
+  const rangeEl = document.getElementById("todoWeekRange");
+  const grid = document.getElementById("todoWeekGrid");
+  const summary = document.getElementById("todoSummary");
+  dateInput.value = todoCursor;
+  const weekStart = todoCursor;
+  const weekEnd = shiftYmd(todoCursor, 6);
+  rangeEl.textContent = `${mmddLabel(weekStart)}(월) ~ ${mmddLabel(weekEnd)}(일)`;
+  const today = todayStamp();
+
+  let totalCount = 0, doneTotal = 0;
+  grid.innerHTML = DOW_WEEK.map((dowKr, i) => {
+    const dateStr = shiftYmd(weekStart, i);
+    const isToday = dateStr === today;
+    const weekend = i === 5 ? "is-weekend sat" : (i === 6 ? "is-weekend" : "");
+    const items = todos.filter(t => t.date === dateStr);
+    const doneCount = items.filter(t => t.done).length;
+    totalCount += items.length;
+    doneTotal += doneCount;
+    const itemsHtml = items.length === 0
+      ? `<div class="td-empty">할 일 없음</div>`
+      : items.map(t => `
+          <div class="todo-item ${t.done?'done':''}">
+            <span class="checkbox ${t.done?'checked':''}" onclick="toggleTodo(${t.id})"></span>
+            <span class="text" onclick="toggleTodo(${t.id})">${escapeHtml(t.text)}</span>
+            <button class="del" onclick="deleteTodo(${t.id})" title="삭제">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+            </button>
+          </div>
+        `).join("");
+    const countBadge = items.length ? `${doneCount}/${items.length}` : "";
+    return `
+      <div class="todo-day ${isToday?'is-today':''} ${weekend}" data-date="${dateStr}">
+        <div class="td-head">
+          <div>
+            <div class="td-dow">${dowKr}${isToday?' · 오늘':''}</div>
+            <div class="td-date">${mmddLabel(dateStr)}</div>
+          </div>
+          <div class="td-count">${countBadge}</div>
+        </div>
+        <div class="td-list">${itemsHtml}</div>
+        <form class="td-add" onsubmit="event.preventDefault(); addTodoFromForm(this)">
+          <input type="text" maxlength="200" placeholder="+ 추가" autocomplete="off">
+          <button type="submit" title="추가">+</button>
+        </form>
+      </div>
+    `;
+  }).join("");
+
+  summary.textContent = totalCount ? `이번 주 완료 ${doneTotal}/${totalCount}건` : "이번 주 등록된 할 일이 없어요. 각 요일 카드에서 바로 추가할 수 있어요.";
+  updateTodoNavCount();
+}
+function updateTodoNavCount(){
+  const today = todayStamp();
+  const pending = todos.filter(t => t.date === today && !t.done).length;
+  const el = document.getElementById("countTodo");
+  if(el) el.textContent = pending;
+}
+function addTodoFromForm(form){
+  const dayEl = form.closest(".todo-day");
+  if(!dayEl) return;
+  const date = dayEl.dataset.date;
+  const inp = form.querySelector("input");
+  const t = String(inp.value||"").trim();
+  if(!t) return;
+  todos.push({id: nextTodoId++, date, text: t, done: false});
+  inp.value = "";
+  persist();
+  renderTodo();
+  // Restore focus to the same day's input after re-render
+  const fresh = document.querySelector(`.todo-day[data-date="${date}"] .td-add input`);
+  if(fresh) fresh.focus();
+}
+function toggleTodo(id){
+  const t = todos.find(x => x.id === id);
+  if(!t) return;
+  t.done = !t.done;
+  persist();
+  renderTodo();
+}
+function deleteTodo(id){
+  const i = todos.findIndex(x => x.id === id);
+  if(i === -1) return;
+  todos.splice(i, 1);
+  persist();
+  renderTodo();
+}
+document.getElementById("todoDate").addEventListener("change", e => {
+  if(e.target.value){ todoCursor = mondayOf(e.target.value); renderTodo(); }
+});
+document.getElementById("todoPrev").addEventListener("click", () => {
+  todoCursor = shiftYmd(todoCursor, -7); renderTodo();
+});
+document.getElementById("todoNext").addEventListener("click", () => {
+  todoCursor = shiftYmd(todoCursor, 7); renderTodo();
+});
+document.getElementById("todoToday").addEventListener("click", () => {
+  todoCursor = mondayOf(todayStamp()); renderTodo();
+});
+
+// ============ Backup / Restore ============
+function todayStamp(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function exportBackup(){
+  const payload = {
+    version: DATA_VERSION,
+    exportedAt: new Date().toISOString(),
+    projects,
+    staff: seedStaff,
+    nextStaffId
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `studio-backup-${todayStamp()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  const meta = getBackupMeta();
+  meta.lastBackupAt = new Date().toISOString();
+  meta.dismissedUntil = null;
+  setBackupMeta(meta);
+  updateBackupBanner();
+  showToast("백업 파일을 내려받았어요 ✓", "ok");
+}
+
+function importBackupFromFile(file){
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch {
+      showToast("올바른 JSON 파일이 아니에요", "err");
+      return;
+    }
+    if(!data || !Array.isArray(data.projects) || !Array.isArray(data.staff)){
+      showToast("백업 구조가 올바르지 않아요 (projects/staff 배열 누락)", "err");
+      return;
+    }
+    const pn = data.projects.length, sn = data.staff.length;
+    if(!confirm(`현재 데이터를 이 백업으로 교체할까요?\n\n프로젝트 ${pn}건, 스태프 ${sn}건\n백업 시각: ${data.exportedAt || '(기록 없음)'}`)){
+      return;
+    }
+    applyLoadedData(data);
+    activeProjectId = null;
+    document.getElementById("staffDetail").style.display = "none";
+    renderAll();
+    showToast(`복원 완료 — 프로젝트 ${pn}건 불러옴 ✓`, "ok");
+  };
+  reader.onerror = () => showToast("파일 읽기 실패", "err");
+  reader.readAsText(file, "utf-8");
+}
+
+// ============ Backup Reminder Banner ============
+function updateBackupBanner(){
+  const banner = document.getElementById("backupBanner");
+  const text = document.getElementById("bannerText");
+  if(!banner || !text) return;
+  const meta = getBackupMeta();
+  const today = todayStamp();
+  if(meta.dismissedUntil === today){
+    banner.classList.remove("show","warn","danger");
+    return;
+  }
+  const days = daysSince(meta.lastBackupAt);
+  if(!isFinite(days)){
+    banner.classList.remove("warn");
+    banner.classList.add("show","danger");
+    text.innerHTML = `<b>아직 한 번도 백업하지 않았어요.</b> 지금 백업해서 데이터를 안전하게 보관하세요.`;
+  } else if(days >= BACKUP_DANGER_DAYS){
+    banner.classList.remove("warn");
+    banner.classList.add("show","danger");
+    text.innerHTML = `<b>${Math.floor(days)}일째 백업하지 않았어요.</b> 데이터 유실 위험이 높아요 — 바로 백업하세요.`;
+  } else if(days >= BACKUP_WARN_DAYS){
+    banner.classList.remove("danger");
+    banner.classList.add("show","warn");
+    text.innerHTML = `<b>${Math.floor(days)}일째 백업하지 않았어요.</b> 월 1회는 백업하는 걸 추천해요.`;
+  } else {
+    banner.classList.remove("show","warn","danger");
+  }
+}
+
+// ============ Toast ============
+let toastTimer = null;
+function showToast(msg, kind){
+  let el = document.querySelector(".toast");
+  if(!el){
+    el = document.createElement("div");
+    el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.className = "toast" + (kind ? " " + kind : "");
+  el.textContent = msg;
+  requestAnimationFrame(() => el.classList.add("show"));
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
+}
+
+// ============ Nav ============
+function clearNavActive(){
+  document.querySelectorAll(".nav-item[data-view],.nav-item[data-page]").forEach(n=>n.classList.remove("active"));
+}
+function showDashboard(){
+  document.getElementById("pageDashboard").style.display = "";
+  document.getElementById("pageCalendar").style.display = "none";
+  document.getElementById("pageTodo").style.display = "none";
+  document.querySelector(".actions").style.display = "";
+}
+function showCalendar(){
+  document.getElementById("pageDashboard").style.display = "none";
+  document.getElementById("pageCalendar").style.display = "";
+  document.getElementById("pageTodo").style.display = "none";
+  document.querySelector(".actions").style.display = "none";
+  document.getElementById("viewTitle").textContent = "캘린더";
+  document.getElementById("viewSub").textContent = "프로젝트 촬영일 월별 보기";
+  renderCalendar();
+}
+function showTodo(){
+  document.getElementById("pageDashboard").style.display = "none";
+  document.getElementById("pageCalendar").style.display = "none";
+  document.getElementById("pageTodo").style.display = "";
+  document.querySelector(".actions").style.display = "none";
+  document.getElementById("viewTitle").textContent = "할 일";
+  document.getElementById("viewSub").textContent = "일별 To-do 관리";
+  renderTodo();
+}
+document.querySelectorAll(".nav-item[data-view]").forEach(el => {
+  el.addEventListener("click", () => {
+    clearNavActive();
+    el.classList.add("active");
+    currentView = el.dataset.view;
+    const meta = VIEW_META[currentView] || VIEW_META.all;
+    document.getElementById("viewTitle").textContent = meta.title;
+    document.getElementById("viewSub").textContent = meta.sub;
+    document.getElementById("activeChip").style.display = currentView === "unsettled" ? "inline-flex" : "none";
+    showDashboard();
+    renderAll();
+  });
+});
+document.querySelectorAll(".nav-item[data-page]").forEach(el => {
+  el.addEventListener("click", () => {
+    clearNavActive();
+    el.classList.add("active");
+    if(el.dataset.page === "calendar") showCalendar();
+    else if(el.dataset.page === "todo") showTodo();
+  });
+});
+
+document.getElementById("searchBox").addEventListener("input", e => {
+  searchQuery = e.target.value;
+  renderTable();
+});
+
+// ============ Modal ============
+function openModal(){ document.getElementById("modal").classList.add("open"); }
+function closeModal(){ document.getElementById("modal").classList.remove("open"); }
+document.getElementById("btnNew").addEventListener("click", openModal);
+document.getElementById("btnCloseStaff").addEventListener("click", hideStaff);
+document.getElementById("modal").addEventListener("click", e => { if(e.target.id === "modal") closeModal(); });
+
+function addStaffRow(){
+  const wrap = document.getElementById("m_staff");
+  const row = document.createElement("div");
+  row.className = "staff-editor-row";
+  row.innerHTML = `
+    <input type="text" placeholder="스태프 이름" class="s_name">
+    <input type="text" inputmode="numeric" placeholder="금액" class="s_amt" oninput="liveFormatAmount(this)">
+    <button class="del" onclick="this.parentNode.remove()">×</button>
+  `;
+  wrap.appendChild(row);
+}
+
+function saveProject(){
+  const name = document.getElementById("m_name").value.trim();
+  const date = document.getElementById("m_date").value;
+  let endDate = document.getElementById("m_endDate").value;
+  const delivery_date = document.getElementById("m_delivery").value;
+  const amt = parseAmount(document.getElementById("m_amt").value);
+  const note = document.getElementById("m_note").value.trim();
+  if(!name || !date){ alert("프로젝트명과 촬영일은 필수입니다."); return; }
+  // 종료일이 시작일 이전이거나 같으면 빈 문자열로 정규화 (단일일 취급)
+  if(!endDate || endDate <= date) endDate = "";
+  const newId = projects.length ? Math.max(...projects.map(p=>p.id)) + 1 : 1;
+  projects.unshift({id:newId, name, date, endDate, delivery_date, client_payment:amt, paid:false, invoice_issued:false, payout:false, note});
+  document.querySelectorAll("#m_staff .staff-editor-row").forEach(row => {
+    const sn = row.querySelector(".s_name").value.trim();
+    const sa = parseAmount(row.querySelector(".s_amt").value);
+    if(sn && sa>0) seedStaff.push({id:nextStaffId++, pid:newId, name:sn, amount:sa, paid:false, taxType:"freelance"});
+  });
+  // Reset form
+  document.getElementById("m_name").value = "";
+  document.getElementById("m_date").value = "";
+  document.getElementById("m_endDate").value = "";
+  document.getElementById("m_delivery").value = "";
+  document.getElementById("m_amt").value = "";
+  document.getElementById("m_note").value = "";
+  document.getElementById("m_staff").innerHTML = `<div class="staff-editor-row"><input type="text" placeholder="스태프 이름" class="s_name"><input type="text" inputmode="numeric" placeholder="금액" class="s_amt" oninput="liveFormatAmount(this)"><button class="del" onclick="this.parentNode.remove()">×</button></div>`;
+  closeModal();
+  renderAll();
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ============ Wire backup/restore buttons ============
+document.getElementById("btnBackup").addEventListener("click", exportBackup);
+document.getElementById("btnRestore").addEventListener("click", () => {
+  document.getElementById("importFileInput").click();
+});
+document.getElementById("importFileInput").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0];
+  importBackupFromFile(file);
+  e.target.value = ""; // allow re-importing the same filename
+});
+document.getElementById("bannerBackupBtn").addEventListener("click", exportBackup);
+document.getElementById("bannerDismissBtn").addEventListener("click", () => {
+  const meta = getBackupMeta();
+  meta.dismissedUntil = todayStamp();
+  setBackupMeta(meta);
+  updateBackupBanner();
+});
+
+// Warn on close if there are unsaved-since-backup changes
+window.addEventListener("beforeunload", (e) => {
+  const meta = getBackupMeta();
+  if(daysSince(meta.lastBackupAt) >= BACKUP_DANGER_DAYS){
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
+
+// ============ Auth UI ============
+const loginOverlay = document.getElementById("loginOverlay");
+const appRoot = document.getElementById("appRoot");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginBtn = document.getElementById("loginBtn");
+const loginMsg = document.getElementById("loginMsg");
+
+function showLogin(){
+  loginOverlay.style.display = "flex";
+  appRoot.style.display = "none";
+}
+function hideLogin(){
+  loginOverlay.style.display = "none";
+  appRoot.style.display = "";
+}
+function setLoginMsg(text, kind){
+  loginMsg.textContent = text || "";
+  loginMsg.className = "login-msg" + (kind ? " " + kind : "");
+}
+
+async function doLoginOrSignup(){
+  const email = (loginEmail.value || "").trim();
+  const password = loginPassword.value || "";
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    setLoginMsg("올바른 이메일을 입력해주세요", "err");
+    return;
+  }
+  if(password.length < 6){
+    setLoginMsg("비밀번호는 6자 이상이어야 해요", "err");
+    return;
+  }
+  loginBtn.disabled = true;
+  setLoginMsg("로그인 중...", "");
+  try {
+    // 1) Try signing in first
+    let res = await sb.auth.signInWithPassword({ email, password });
+    if(res.error){
+      const msg = (res.error.message || "").toLowerCase();
+      // 2) If user doesn't exist → sign up
+      if(msg.includes("invalid login") || msg.includes("invalid credentials") || msg.includes("not found")){
+        setLoginMsg("새 계정 생성 중...", "");
+        const signup = await sb.auth.signUp({ email, password });
+        if(signup.error) throw signup.error;
+        if(!signup.data.session){
+          // Email confirmation is enabled — we asked user to disable this; show hint
+          setLoginMsg("계정이 생성되었지만 이메일 확인이 필요해요. Supabase 대시보드의 Authentication → Sign In / Providers → Email에서 'Confirm email'을 꺼주세요.", "err");
+          return;
+        }
+      } else {
+        throw res.error;
+      }
+    }
+    try { localStorage.setItem("studio-last-email", email); } catch(_){}
+    setLoginMsg("✓ 로그인 성공", "ok");
+    // boot() will be invoked by onAuthStateChange (which reloads the page)
+    setTimeout(() => location.reload(), 300);
+  } catch(err){
+    setLoginMsg("실패: " + (err.message || "네트워크 오류"), "err");
+  } finally {
+    loginBtn.disabled = false;
+  }
+}
+loginBtn.addEventListener("click", doLoginOrSignup);
+loginEmail.addEventListener("keydown", e => { if(e.key === "Enter") loginPassword.focus(); });
+loginPassword.addEventListener("keydown", e => { if(e.key === "Enter") doLoginOrSignup(); });
+try {
+  const last = localStorage.getItem("studio-last-email");
+  if(last) loginEmail.value = last;
+} catch(_){}
+
+// ============ Realtime subscription ============
+function subscribeRealtime(){
+  if(realtimeChannel){
+    try { sb.removeChannel(realtimeChannel); } catch(_){}
+  }
+  realtimeChannel = sb.channel("studio-sync")
+    .on("postgres_changes", { event: "*", schema: "public", table: "projects" }, onRemoteChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "staff" }, onRemoteChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "todos" }, onRemoteChange)
+    .subscribe();
+}
+let remoteReloadTimer = null;
+function onRemoteChange(){
+  // Don't re-fetch if a local sync is in flight (avoids flicker/races)
+  if(syncPending) return;
+  if(remoteReloadTimer) clearTimeout(remoteReloadTimer);
+  remoteReloadTimer = setTimeout(async () => {
+    const ok = await loadFromSupabase();
+    if(ok){ renderAll(); if(document.getElementById("pageTodo").style.display !== "none") renderTodo(); }
+  }, 300);
+}
+
+// ============ User chip (logout) in header ============
+function renderUserChip(){
+  let host = document.querySelector(".user-chip-host");
+  if(!host){
+    const actions = document.querySelector(".actions");
+    if(!actions) return;
+    host = document.createElement("span");
+    host.className = "user-chip-host";
+    host.style.marginLeft = "8px";
+    actions.appendChild(host);
+  }
+  if(!currentUser){ host.innerHTML = ""; return; }
+  host.innerHTML = `<span class="user-chip">${escapeHtml(currentUser.email || "user")}<button title="로그아웃" id="btnLogout">로그아웃</button></span>`;
+  const lo = document.getElementById("btnLogout");
+  if(lo) lo.addEventListener("click", async () => {
+    await sb.auth.signOut();
+    location.reload();
+  });
+}
+
+// ============ Boot ============
+async function boot(){
+  // Check existing session (handles magic link redirect)
+  const { data: { session } } = await sb.auth.getSession();
+  if(!session){
+    // Try localStorage cache only for visual (read-only) on login screen
+    showLogin();
+    // listen for future auth state changes
+    sb.auth.onAuthStateChange((_evt, newSession) => {
+      if(newSession && !currentUser){ location.reload(); }
+    });
+    return;
+  }
+  currentUser = session.user;
+  hideLogin();
+  renderUserChip();
+
+  // Try to load from cache first for instant render, then fetch fresh from Supabase
+  const cached = loadFromStorage();
+  if(cached){ renderAll(); updateBackupBanner(); updateTodoNavCount(); }
+
+  const ok = await loadFromSupabase();
+  if(ok){
+    renderAll();
+    updateBackupBanner();
+    updateTodoNavCount();
+  }
+  subscribeRealtime();
+
+  // Reload on auth loss (token expired etc.)
+  sb.auth.onAuthStateChange((_evt, newSession) => {
+    if(!newSession){ location.reload(); }
+  });
+}
+
+boot();
+</script>
+
+</body>
+</html>
