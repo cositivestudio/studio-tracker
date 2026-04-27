@@ -487,6 +487,45 @@ tr.staff-total-row td{padding:12px 14px;border-bottom:none}
   .main{padding:20px}
   .stats{grid-template-columns:repeat(2,1fr)}
 }
+
+/* Mobile (phone) refinements */
+@media (max-width:600px){
+  body{font-size:14px}
+  .main{padding:16px;overflow-x:hidden}
+
+  /* Header: title on top, action buttons wrap to next row */
+  .main-header{flex-direction:column;align-items:stretch;gap:12px;margin-bottom:16px}
+  .main-header h2{font-size:20px;word-break:keep-all}
+  .main-header .sub{font-size:12px}
+  .actions{flex-wrap:wrap;gap:8px}
+  .actions .btn{flex:1 1 calc(50% - 4px);min-height:40px;justify-content:center;white-space:nowrap}
+  .actions .btn.primary{flex:1 1 100%}
+  .actions .chip{flex:1 1 100%;justify-content:center;padding:8px 10px;font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+
+  /* Stats: stack 1-up */
+  .stats{grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+
+  /* Tables: keep horizontal scroll inside wrapper, prevent body overflow */
+  .table-wrap{border-radius:0 0 8px 8px}
+  table{min-width:720px;font-size:13px}
+
+  /* Filter bar: stack input + button */
+  .filter-bar{flex-direction:column;align-items:stretch;gap:8px;padding:12px}
+  .filter-bar input[type=text]{font-size:16px;padding:10px 12px;min-height:42px}
+  .filter-bar .btn{min-height:40px;justify-content:center}
+
+  /* Banners */
+  .backup-banner{flex-direction:column;align-items:stretch;gap:8px;padding:12px}
+  .banner-actions{display:flex;gap:8px}
+  .banner-actions .banner-btn{flex:1}
+
+  /* Modal: full-width on small screens */
+  .modal{width:calc(100vw - 24px);max-width:none;max-height:90vh;overflow-y:auto}
+  .modal input[type=text],.modal input[type=date],.modal input[type=number],.modal textarea{font-size:16px}
+
+  /* Touch-friendly buttons globally */
+  .btn{min-height:38px}
+}
 /* Login overlay */
 .login-overlay{position:fixed;inset:0;background:#f6f7f9;display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
 .login-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:32px 28px;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(17,20,24,0.06)}
@@ -2083,37 +2122,29 @@ function renderUserChip(){
 
 // ============ Boot ============
 async function boot(){
+  hideLogin();
+
   // Check existing session (handles magic link redirect)
   const { data: { session } } = await sb.auth.getSession();
-  if(!session){
-    // Try localStorage cache only for visual (read-only) on login screen
-    showLogin();
-    // listen for future auth state changes
-    sb.auth.onAuthStateChange((_evt, newSession) => {
-      if(newSession && !currentUser){ location.reload(); }
-    });
-    return;
+  if(session){
+    currentUser = session.user;
+    renderUserChip();
   }
-  currentUser = session.user;
-  hideLogin();
-  renderUserChip();
 
-  // Try to load from cache first for instant render, then fetch fresh from Supabase
+  // Load from localStorage cache (data is preserved regardless of login state)
   const cached = loadFromStorage();
   if(cached){ renderAll(); updateBackupBanner(); updateTodoNavCount(); }
 
-  const ok = await loadFromSupabase();
-  if(ok){
-    renderAll();
-    updateBackupBanner();
-    updateTodoNavCount();
+  // If logged in, also fetch fresh from Supabase and subscribe to realtime
+  if(session){
+    const ok = await loadFromSupabase();
+    if(ok){
+      renderAll();
+      updateBackupBanner();
+      updateTodoNavCount();
+    }
+    subscribeRealtime();
   }
-  subscribeRealtime();
-
-  // Reload on auth loss (token expired etc.)
-  sb.auth.onAuthStateChange((_evt, newSession) => {
-    if(!newSession){ location.reload(); }
-  });
 }
 
 boot();
